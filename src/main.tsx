@@ -7,18 +7,18 @@ import { Root } from "./root";
 import { Editor } from "./editor";
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <Root />,
-	},
-	{
-		path: "/editor/:groupName",
-		element: <Editor />,
-	},
+  {
+    path: "/",
+    element: <Root />,
+  },
+  {
+    path: "/editor/:groupName",
+    element: <Editor />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<React.StrictMode>
-		<RouterProvider router={router} />
-	</React.StrictMode>
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );
