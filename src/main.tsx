@@ -6,19 +6,22 @@ import "./index.css";
 import { Root } from "./root";
 import { Editor } from "./editor";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-  },
-  {
-    path: "/editor/:groupName",
-    element: <Editor />,
-  },
-]);
+const router = createBrowserRouter(
+	[
+		{
+			path: "/",
+			element: <Root />,
+		},
+		{
+			path: "/editor/:groupName",
+			element: <Editor />,
+		},
+	],
+	{ basename: import.meta.env.VITE_BASE }
+);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+	<React.StrictMode>
+		<RouterProvider router={router} />
+	</React.StrictMode>
 );
