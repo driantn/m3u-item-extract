@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import type { PlaylistItem } from "iptv-playlist-parser";
@@ -11,14 +11,17 @@ export const Editor = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const params = useParams();
+	const [selectedAll, setSelectedAll] = useState<string[]>([]);
 
 	const { groupName = "Other" } = params;
+
 	const { payload } = location.state as {
 		payload: Record<string, Array<Item>>;
 	};
+
 	const menu = Object.keys(payload);
 
-	const contents = payload[groupName] as Array<Item>;
+	const contents = payload[`${groupName}`] as Array<Item>;
 
 	const onScroll = (evt: WheelEvent) => {
 		evt.preventDefault();
@@ -40,25 +43,44 @@ export const Editor = () => {
 
 	useEffect(() => {
 		menuRef.current?.addEventListener("wheel", onScroll);
+		document
+			.getElementsByClassName("isActive")?.[0]
+			.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+				inline: "center",
+			});
 		() => menuRef.current?.removeEventListener("wheel", onScroll);
 	}, []);
 
 	const onSave = () => {
 		let data = "#EXTM3U \n";
+
 		const selectedItmes = Object.values(payload)
 			.map((contents) => contents.filter((item) => item.checked))
 			.flat();
 
-		data = selectedItmes.map((item) => `${item.raw} \n`).join("\n");
+		data += selectedItmes.map((item) => `${item.raw} \n`).join("\n");
 
 		fileDownload(data, "channels.m3u");
+	};
+
+	const onSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+		const checked = event.target.checked;
+		if (checked) {
+			setSelectedAll([...selectedAll, `${groupName}`]);
+		} else {
+			setSelectedAll(selectedAll.filter((item) => item !== `${groupName}`));
+		}
+
+		contents.forEach((content) => (content.checked = checked));
 	};
 
 	return (
 		<div className="max-w-5xl mx-auto my-2 p-4 flex flex-col gap-5 h-screen">
 			<div
 				ref={menuRef}
-				className="flex flex-row flex-nowrap w-full overflow-x-auto border border-gray-300 items-center justify-start"
+				className="flex flex-row flex-nowrap w-full overflow-x-auto border border-gray-300 items-center justify-start min-h-[50px]"
 			>
 				{menu.map((item) => (
 					<div
@@ -66,7 +88,7 @@ export const Editor = () => {
 						className={classNames(
 							"p-2 border border-r-gray-300 flex-grow basis-0 text-center whitespace-nowrap hover:bg-slate-300 cursor-pointer",
 							{
-								"bg-slate-400 text-white": item === groupName,
+								"bg-slate-400 text-white isActive": item === groupName,
 							}
 						)}
 						onClick={() => onMenuClick(item)}
@@ -76,9 +98,19 @@ export const Editor = () => {
 				))}
 			</div>
 			<div className="flex flex-col w-full">
+				<div>
+					<label className="flex flex-row gap-3 border border-b-gray-300 w-full p-2">
+						<input
+							type="checkbox"
+							checked={selectedAll.includes(`${groupName}`)}
+							onChange={(event) => onSelectAll(event)}
+						/>
+						Select All
+					</label>
+				</div>
 				{contents.map((content) => {
 					return (
-						<div key={content.name}>
+						<div key={`${groupName}-${content.name}`}>
 							<label className="flex flex-row gap-3 border border-b-gray-300 w-full p-2">
 								<input
 									type="checkbox"
