@@ -43,13 +43,11 @@ export const Editor = () => {
 
 	useEffect(() => {
 		menuRef.current?.addEventListener("wheel", onScroll);
-		document
-			.getElementsByClassName("isActive")?.[0]
-			.scrollIntoView({
-				behavior: "smooth",
-				block: "center",
-				inline: "center",
-			});
+		document.getElementsByClassName("isActive")?.[0].scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center",
+		});
 		() => menuRef.current?.removeEventListener("wheel", onScroll);
 	}, []);
 
@@ -60,7 +58,7 @@ export const Editor = () => {
 			.map((contents) => contents.filter((item) => item.checked))
 			.flat();
 
-		data += selectedItmes.map((item) => `${item.raw} \n`).join("\n");
+		data += selectedItmes.map((item) => `${item.raw}`).join("\n");
 
 		fileDownload(data, "channels.m3u");
 	};
